@@ -218,7 +218,7 @@ class MAE3D(nn.Module):
             norms.append(norm)
         return -torch.tensor(norms).mean()  # 返回均值核范数
 
-    def local_forward(self, x):
+    def local_forward(self, x, model):
         args = self.args
         batch_size = x.size(0)
         in_chans = x.size(1)
@@ -306,9 +306,34 @@ class MAE3D(nn.Module):
         hog_target = hog_target.view(B, L, -1)
         local_loss = torch.nn.functional.mse_loss(hog_pred, hog_target)
 
-        return local_loss, nnm_loss
+        # Get current gradients
+        current_gradients = []
+        for param in model.parameters():
+            if param.grad is not None:
+                current_gradients.append(param.grad.detach().flatten())
+        current_gradients = torch.cat(current_gradients)
 
-    def forward(self, x, return_image=False):
+        # Compute gradient change rate
+        if self.prev_gradients is not None:
+            grad_diff = torch.norm(current_gradients - self.prev_gradients, p=2)
+            prev_norm = torch.norm(self.prev_gradients, p=2)
+            delta_L = grad_diff / (prev_norm + 1e-8)
+
+            # Compute dynamic weights
+            w_i = 1.0 / (1.0 + self.alpha * delta_L)
+            w_i_norm = w_i / (w_i + 1e-8)  # Normalization
+
+            # Compute weighted loss
+            weighted_loss = w_i_norm * local_loss
+        else:
+            weighted_loss = local_loss
+
+        # Store current gradients for next step
+        self.prev_gradients = current_gradients.clone()
+
+        return weighted_loss, nnm_loss
+
+    def forward(self, x, model, return_image=False):
         '''
         :param x: (8, 1, 96, 96, 96)
         :param return_image: True or False
@@ -322,7 +347,7 @@ class MAE3D(nn.Module):
 
         # local reconstruction
         sub_column = self.local_sampling(x)
-        local_loss, nnm_loss = self.local_forward(sub_column)
+        local_loss, nnm_loss = self.local_forward(sub_column, model)
         # print(local_loss)
 
         x = patchify_image(x, self.patch_size)  # [B,gh*gw*gd,ph*pw*pd*C]
