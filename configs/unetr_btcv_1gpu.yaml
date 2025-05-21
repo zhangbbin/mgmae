@@ -6,16 +6,16 @@ dec_arch: UNETR_decoder
 # wandb
 proj_name: UNETR3D
 run_name: ${proj_name}_${arch}_${dataset}
-wandb_id: zhangbbin123
+wandb_id: 
 disable_wandb: false
 
 # dataset
 dataset: btcv
 json_list: 'dataset.json'
-data_path: D:/repository/opensource/SelfMedMAE/mae3d/BTCV
+data_path: 
 
 # output
-output_dir: D:/repository/opensource/SelfMedMAE/mae3d/ssl-framework/${run_name}
+output_dir: 
 ckpt_dir: ${output_dir}/ckpts
 
 # data preprocessing
@@ -38,9 +38,9 @@ batch_size: 1
 val_batch_size: 1 # per gpu
 start_epoch: 0
 warmup_epochs: 50
-epochs: 500
-workers: 2
-pretrain: D:/repository/opensource/SelfMedMAE/mae3d/ssl-framework/mae3d_vit_base_btcv/ckpts/checkpoint_0199.pth
+epochs: 1000
+workers: 
+pretrain: 
 resume:
 
 # drop
