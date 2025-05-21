@@ -7,15 +7,15 @@ dec_arch: MAEViTDecoder
 proj_name: mae3d
 run_name: ${proj_name}_${arch}_${dataset}
 disable_wandb: false
-wandb_id: zhangbbin123
+wandb_id: 
 
 # dataset
 dataset: btcv
 json_list: 'dataset.json'
-data_path: D:/repository/pycharm/pytorch_models/MG-MAE/mae3d/BTCV
+data_path: 
 
 # output
-output_dir: D:/repository/pycharm/pytorch_models/MG-MAE/mae3d/ssl-framework/${run_name}
+output_dir: 
 ckpt_dir: ${output_dir}/ckpts
 
 # data preprocessing
@@ -35,8 +35,8 @@ batch_size: 4
 vis_batch_size: 1
 start_epoch: 0
 warmup_epochs: 100
-epochs: 4000
-workers: 2
+epochs: 
+workers: 
 resume:
 
 # model
