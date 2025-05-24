@@ -1,1 +1,1 @@
-# mgmae
+# mmae for medical image segmentation
