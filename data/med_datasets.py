@@ -11,10 +11,6 @@ from monai.apps import DecathlonDataset, CrossValidation
 from packaging import version
 _persistent_workers = False if version.parse(torch.__version__) < version.parse('1.8.2') else True
 
-# idx2label_all = {
-#     'btcv': ['spleen'],
-#     'msd_brats': ['TC', 'WT', 'ET']
-# }
 idx2label_all = {
     'btcv': ['spleen',
              'right kidney',
@@ -33,7 +29,6 @@ idx2label_all = {
 }
 
 btcv_8cls_idx = [0, 1, 2, 3, 5, 6, 7, 10]
-# btcv_8cls_idx = [0]
 
 class Sampler(torch.utils.data.Sampler):
     def __init__(self, dataset, num_replicas=None, rank=None,
