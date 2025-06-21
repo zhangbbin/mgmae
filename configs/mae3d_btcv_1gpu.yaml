@@ -10,8 +10,8 @@ disable_wandb: false
 wandb_id: 
 
 # dataset
-dataset: btcv
-json_list: 'dataset.json'
+dataset: 
+json_list: 
 data_path: 
 
 # output
@@ -31,7 +31,7 @@ RandRotate90d_prob: 0.2
 
 # trainer
 trainer_name: MAE3DTrainer
-batch_size: 4
+batch_size: 
 vis_batch_size: 1
 start_epoch: 0
 warmup_epochs: 100
