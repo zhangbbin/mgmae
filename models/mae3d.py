@@ -164,31 +164,24 @@ class MAE3D(nn.Module):
         nn.init.normal_(self.mask_token, std=.02)
 
     def local_sampling(self, x):
-        # 定义子体积的大小
         sub_volume_shape = (32, 32, 32)
-
-        # 获取每个维度的最大起始索引
         max_start_idx = (x.shape[2] - sub_volume_shape[0],
                          x.shape[3] - sub_volume_shape[1],
                          x.shape[4] - sub_volume_shape[2])
 
-        # 存储子体积的张量列表
         sub_volumes = []
 
         for i in range(x.shape[0]):
-            # 随机选择每个维度的起始索引
             start_x = random.randint(0, max_start_idx[0])
             start_y = random.randint(0, max_start_idx[1])
             start_z = random.randint(0, max_start_idx[2])
 
-            # 截取子体积
             sub_volume = x[i:i + 1, :,
                          start_x:start_x + sub_volume_shape[0],
                          start_y:start_y + sub_volume_shape[1],
                          start_z:start_z + sub_volume_shape[2]]
             sub_volumes.append(sub_volume)
 
-        # 将子体积列表拼接成形状为 (8, 1, 32, 32, 32) 的张量
         result = torch.cat(sub_volumes, dim=0)
 
         return result
@@ -196,16 +189,13 @@ class MAE3D(nn.Module):
     def nuclear_norm(self, x):
         # x: (batch_size, sequence_length, features)
         x = x[:, 1:, :]
-        # 归一化
         x = torch.softmax(x, dim=-1)
-        # 计算核范数
         norms = []
-        for i in range(x.shape[0]):  # 对每个样本计算
-            # 对最后两个维度进行SVD
+        for i in range(x.shape[0]):  
             _, s, _ = torch.svd(x[i].view(-1, 768))
-            norm = s.sum()  # 核范数是奇异值的和
+            norm = s.sum()  
             norms.append(norm)
-        return -torch.tensor(norms).mean()  # 返回均值核范数
+        return -torch.tensor(norms).mean()  
 
     def local_forward(self, x):
         args = self.args
@@ -321,7 +311,7 @@ class MAE3D(nn.Module):
         all_x = self.decoder(all_x)
 
         # loss
-        loss = self.criterion(input=all_x[:, -msk_length:, :], target=self.patch_norm(msk_x.detach())) + 0.3 * local_loss + 0.3 * nnm_loss
+        loss = self.criterion(input=all_x[:, -msk_length:, :], target=self.patch_norm(msk_x.detach()))
 
         if return_image:
             # unshuffled all the tokens
@@ -331,3 +321,4 @@ class MAE3D(nn.Module):
             return loss, x.detach(), recon.detach(), masked_x.detach()
         else:
             return loss
+
